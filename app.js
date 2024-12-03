@@ -246,10 +246,19 @@ function updateUser(element) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert("Cập nhật thành công!");
-                // fetchUsers();  // Tải lại danh sách người dùng
+                Swal.fire({
+                    title: 'Notification',
+                    text: "Cập nhật thành công!",
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                });
             } else {
-                alert("Có lỗi khi cập nhật: " + data.message);
+                Swal.fire({
+                    title: 'Notification',
+                    text: "Có lỗi khi cập nhật: " + data.message,
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
             }
         })
         .catch(error => console.error("Error:", error));
