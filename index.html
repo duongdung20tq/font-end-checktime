@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Call Example</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(to bottom, #33ccff, #ff99cc);
+            position: relative;
+        }
+        .container {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            width: 90%;
+            max-width: 320px;
+            box-sizing: border-box;
+            position: relative;
+            z-index: 2;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        label {
+            display: block;
+            text-align: left;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #333;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 4px #007bff;
+        }
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        button {
+            padding: 8px;
+            font-size: 14px;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        #checkin-btn {
+            background-color: #28a745;
+        }
+        #checkin-btn:hover {
+            background-color: #218838;
+        }
+        #checkout-btn {
+            background-color: #dc3545;
+        }
+        #checkout-btn:hover {
+            background-color: #c82333;
+        }
+        #log {
+            margin-top: 10px;
+            text-align: left;
+            font-size: 12px;
+            color: #555;
+            word-wrap: break-word;
+        }
+        .fa {
+            font-size: 14px;
+        }
+
+        /* Hiệu ứng nền động hoa dơi */
+        .flower {
+            position: absolute;
+            background: #fff;
+            opacity: 0.8;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: float 6s linear infinite;
+            box-shadow: 0 0 4px #fff;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+       .floating-icon {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-size: 30px;
+            color:#F49CCF;
+            background-color: #F49CCF;
+            padding: 10px;
+            border-radius: 50%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .floating-icon:hover {
+            color: #fff;
+            background-color: #4a90e2;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Check Attendance</h1>
+        <label for="username">Username</label>
+        <input type="text" id="username" placeholder="Enter Username" />
+        
+        <label for="password">Password</label>
+    <div style="position: relative;">
+        <input type="password" id="password" placeholder="Enter Password" />
+        <i id="togglePassword" class="fa fa-eye" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;"></i>
+    </div>
+        
+        <div class="button-group">
+            <button id="checkin-btn"><i class="fa fa-sign-in-alt"></i> Check-in</button>
+            <button id="checkout-btn"><i class="fa fa-sign-out-alt"></i> Check-out</button>
+        </div>
+        <!-- <div id="log"></div> -->
+        <script src="script.js"></script>
+    </div>
+    <div class="floating-icon" onclick="window.location.href='abc.html'">
+        <i class="fas fa-clipboard"></i>
+    </div>
+
+
+    <script>
+        // Tạo hiệu ứng nền động với hoa dơi
+        function createFlower() {
+            const flower = document.createElement('div');
+            flower.classList.add('flower');
+            flower.style.left = `${Math.random() * 100}vw`;
+            flower.style.animationDuration = `${Math.random() * 5 + 3}s`;
+            flower.style.width = `${Math.random() * 10 + 3}px`;
+            flower.style.height = flower.style.width;
+            document.body.appendChild(flower);
+            
+            setTimeout(() => {
+                flower.remove();
+            }, 8000); // Loại bỏ hoa dơi sau 8 giây
+        }
+          const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+
+        togglePassword.addEventListener('click', () => {
+            // Đổi kiểu input giữa 'password' và 'text'
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            // Đổi icon giữa fa-eye và fa-eye-slash
+            togglePassword.classList.toggle('fa-eye');
+            togglePassword.classList.toggle('fa-eye-slash');
+        });
+        setInterval(createFlower, 300); // Tạo hoa dơi mỗi 300ms
+    </script>
+</body>
+</html>
