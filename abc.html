@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý người dùng - Hoa rơi</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        /* Reset một số thuộc tính mặc định */
+        body, h2, p {
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Body Styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to bottom, #e0f7fa, #ffecb3);
+            color: #333;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        h2 {
+            text-align: center;
+            margin: 20px 0;
+            color: #2c9a37;
+            font-size: 1.5em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Styling cho bảng */
+        table {
+            width: 90%;
+            margin: 0 auto 20px auto;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+            font-size: 1em;
+            transition: background 0.3s;
+        }
+
+        th {
+            background: #55aafa;
+            color: white;
+        }
+
+        td:hover {
+            background-color: #f1f1f1;
+        }
+
+        td {
+            background: #ffffff;
+        }
+
+        /* Popup styling */
+        #passwordPopup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background-color: white;
+            border: 2px solid #4cd65f;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            width: 80%;
+            max-width: 400px;
+        }
+
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        /* Button styling */
+        button {
+            padding: 12px 18px;
+            margin-top: 10px;
+            background-color: #22695d;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            font-size: 1em;
+            font-weight: bold;
+            width: auto;
+        }
+
+        button:hover {
+            background-color: #62a2e6;
+            transform: scale(1.05);
+        }
+
+        /* Hoa rơi */
+        .petal {
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            background: url('https://i.imgur.com/G3MArDk.png');
+            background-size: cover;
+            animation: fall linear infinite;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.8;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(calc(100vh + 100px)) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Responsive styling for smaller devices */
+        @media (max-width: 768px) {
+            h2 {
+                font-size: 1.2em;
+            }
+            
+            table, #tokenResult {
+                width: 95%;
+            }
+
+            th, td {
+                font-size: 0.85em;
+                padding: 10px;
+            }
+
+            #passwordPopup {
+                width: 90%;
+                padding: 15px;
+            }
+
+          
+        }
+        #toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background-color: #4CAF50; /* Màu xanh lá */
+        color: #fff;
+        padding: 16px;
+        border-radius: 8px;
+        font-size: 1em;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.5s, visibility 0.5s;
+        z-index: 1001;
+    }
+    .small-button {
+            padding: 5px 10px;
+            font-size: 14px;
+            border-radius: 5px;
+            position: relative;
+            overflow: hidden;
+        }
+        .button-container {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        .particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: #ffc107;
+            animation: fly 0.6s ease-out forwards;
+        }
+        @keyframes fly {
+            to {
+                transform: translate(var(--x), var(--y));
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h2>Quản lý tài khoản</h2>
+    <form id="addUserForm"></form>
+
+    <h2>Danh sách người dùng</h2>
+    <table id="userTable">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Password</th>
+                <th>Device ID</th>
+                <th>Device Name</th>
+                <th>Check Auto</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <div id="toast"></div>
+
+        <!-- Các nút với hiệu ứng -->
+        <div class="button-container">
+            <button class="btn btn-primary small-button" id="getTokenButton" onclick="getDeviceToken()">Get Token</button>
+            <!-- <button class="btn btn-success small-button" id="checkInAll" onclick="checkInAll()">Check In All</button> -->
+            <!-- <button class="btn btn-danger small-button" id="checkOutAll" onclick="checkOutAll()">Check Out All</button> -->
+            <button class="btn btn-info small-button" onclick="window.location.href='log.html'">Log User</button>
+        </div>
+
+
+    <div id="tokenResult"></div>
+
+    <div id="passwordPopup">
+        <h3>Nhập mật khẩu mới</h3>
+        <input type="text" id="newPasswordInput" placeholder="Mật khẩu mới" required>
+        <button onclick="updatePassword()">Cập nhật mật khẩu</button>
+        <button onclick="closePopup()">Đóng</button>
+    </div>
+  
+      
+
+
+    <div id="overlay"></div>
+
+    <script src="app.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function addParticles(button) {
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('span');
+                particle.classList.add('particle');
+                
+                // Random vị trí và dịch chuyển cho các hạt
+                const x = (Math.random() - 0.5) * 100 + 'px';
+                const y = (Math.random() - 0.5) * 100 + 'px';
+                particle.style.setProperty('--x', x);
+                particle.style.setProperty('--y', y);
+                
+                // Đặt vị trí hạt ở giữa nút
+                particle.style.left = `${button.offsetWidth / 2}px`;
+                particle.style.top = `${button.offsetHeight / 2}px`;
+                
+                button.appendChild(particle);
+                
+                // Xóa hạt sau khi hoàn thành animation
+                particle.addEventListener('animationend', () => {
+                    particle.remove();
+                });
+            }
+        }
+    </script>
+</body>
+</html>
